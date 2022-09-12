@@ -12,6 +12,9 @@ public class AndroidTicTacToeActivity {
     public static final char COMPUTER_PLAYER = 'O';
     public static final char OPEN_SPOT = ' ';
 
+    public enum DifficultyLevel {Easy, Harder, Expert};
+    private DifficultyLevel mDifficultyLevel = DifficultyLevel.Expert;
+
     private Random mRand;
 
     public AndroidTicTacToeActivity() {
@@ -66,45 +69,25 @@ public class AndroidTicTacToeActivity {
     }
 
     public int getComputerMove(){
-        // First see if there's a move O can make to win
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if (mBoard[i] == OPEN_SPOT){
-                //VERTICAL
-                if (mBoard[ (i + N) % BOARD_SIZE ] == COMPUTER_PLAYER
-                        && mBoard[ (i + 2 * N) % BOARD_SIZE ] == COMPUTER_PLAYER) return i;
-
-                    //HORIZONTAL
-                else if (mBoard[((i + 1) % N)+ i - (i % N)] == COMPUTER_PLAYER
-                        && mBoard[((i + 2) % N)+ i - (i % N)] == COMPUTER_PLAYER) return i;
-
-                    //DIAGONAL \
-                else if( (i  == 0 && mBoard[4] == COMPUTER_PLAYER && mBoard[8] == COMPUTER_PLAYER) || (i  == 4 && mBoard[0] == COMPUTER_PLAYER && mBoard[8] == COMPUTER_PLAYER) || (i  == 8 && mBoard[4] == COMPUTER_PLAYER && mBoard[0] == COMPUTER_PLAYER)) return i;
-
-                    //DIAGONAL /
-                else if( (i  == 2 && mBoard[4] == COMPUTER_PLAYER && mBoard[6] == COMPUTER_PLAYER) || (i  == 4 && mBoard[2] == COMPUTER_PLAYER && mBoard[6] == COMPUTER_PLAYER) || (i  == 6 && mBoard[4] == COMPUTER_PLAYER && mBoard[2] == COMPUTER_PLAYER)) return i;
-            }
+        int move = -1;
+        if (mDifficultyLevel == DifficultyLevel.Easy)
+            move = getRandomMove();
+        else if (mDifficultyLevel == DifficultyLevel.Harder) {
+            move = getWinningMove();
+            if (move == -1)
+                move = getRandomMove();
         }
-
-        // See if there's a move O can make to block X from winning
-        for (int i = 0; i < BOARD_SIZE; i++) {
-
-            //VERTICAL
-            if (mBoard[i] == OPEN_SPOT) {
-                if (mBoard[(i + N) % BOARD_SIZE] == HUMAN_PLAYER && mBoard[(i + 2 * N) % BOARD_SIZE] == HUMAN_PLAYER) return i;
-
-                //HORIZONTAL
-                else if (mBoard[((i + 1) % N) + i - (i % N)] == HUMAN_PLAYER && mBoard[((i + 2) % N) + i - (i % N)] == HUMAN_PLAYER) return i;
-
-                //DIAGONAL \
-                else if ((i == 0 && mBoard[4] == HUMAN_PLAYER && mBoard[8] == HUMAN_PLAYER) || (i == 4 && mBoard[0] == HUMAN_PLAYER && mBoard[8] == HUMAN_PLAYER) || (i == 8 && mBoard[4] == HUMAN_PLAYER && mBoard[0] == HUMAN_PLAYER))
-                    return i;
-                //DIAGONAL /
-                else if ((i == 2 && mBoard[4] == HUMAN_PLAYER && mBoard[6] == HUMAN_PLAYER) || (i == 4 && mBoard[2] == HUMAN_PLAYER && mBoard[6] == HUMAN_PLAYER) || (i == 6 && mBoard[4] == HUMAN_PLAYER && mBoard[2] == HUMAN_PLAYER))
-                    return i;
-            }
+        else if (mDifficultyLevel == DifficultyLevel.Expert) {
+            move = getWinningMove();
+            if (move == -1)
+                move = getBlockingMove();
+            if (move == -1)
+                move = getRandomMove();
         }
+        return move;
+    }
 
-        // Generate random move
+    private int getRandomMove() {
         int move;
         do{
             move = mRand.nextInt(BOARD_SIZE);
@@ -113,7 +96,52 @@ public class AndroidTicTacToeActivity {
         return move;
     }
 
+    private int getBlockingMove(){
+        int move = -1;
+        // See if there's a move O can make to block X from winning
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (mBoard[i] == OPEN_SPOT) {
+                mBoard[i] = HUMAN_PLAYER;
+                if(checkForWinner() == 2){
+                    mBoard[i] = OPEN_SPOT;
+                    return i;
+                }else{
+                    mBoard[i] = OPEN_SPOT;
+                }
+            }
+        }
+        return move;
+    }
+
+    private int getWinningMove(){
+        int move = -1;
+        // First see if there's a move O can make to win
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if (mBoard[i] == OPEN_SPOT){
+                mBoard[i] = COMPUTER_PLAYER;
+                if(checkForWinner() == 3){
+                    mBoard[i] = OPEN_SPOT;
+                    return i;
+                }else{
+                    mBoard[i] = OPEN_SPOT;
+                }
+            }
+        }
+        return move;
+    }
+
     public void clearBoard(){
         Arrays.fill(mBoard, OPEN_SPOT);
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return mDifficultyLevel;
+    }
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        mDifficultyLevel = difficultyLevel;
+    }
+
+    public char getBoardOccupant(int i) {
+        return mBoard[i];
     }
 }
