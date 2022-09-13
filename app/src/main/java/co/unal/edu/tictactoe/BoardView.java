@@ -51,8 +51,11 @@ public class BoardView extends View {
         mPaint.setStrokeWidth(GRID_WIDTH);
 // Draw the two vertical board lines
         int cellWidth = boardWidth / 3;
-        canvas.drawLine(cellWidth, 0, cellWidth, boardHeight, mPaint);
+        canvas.drawLine(cellWidth, 0 , cellWidth, boardHeight, mPaint);
         canvas.drawLine(cellWidth * 2, 0, cellWidth * 2, boardHeight, mPaint);
+        canvas.drawLine(0, cellWidth,  boardWidth , cellWidth , mPaint);
+        canvas.drawLine(0, cellWidth * 2,  boardWidth , cellWidth * 2 , mPaint);
+
 
         // Draw all the X and O images
         for (int i = 0; i < AndroidTicTacToeActivity.BOARD_SIZE; i++) {
@@ -78,5 +81,13 @@ public class BoardView extends View {
                         null);
             }
         }
+    }
+
+    public int getBoardCellWidth() {
+        return getWidth() / 3;
+    }
+
+    public int getBoardCellHeight() {
+        return getHeight() / 3;
     }
 }

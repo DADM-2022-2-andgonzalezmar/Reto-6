@@ -23,8 +23,17 @@ public class AndroidTicTacToeActivity {
         mRand = new Random();
     }
 
-    public void setMove(char player, int location){
+    /*public void setMove(char player, int location){
         if(mBoard[location] == OPEN_SPOT) mBoard[location] = player;
+    }*/
+
+    public boolean setMove(char player, int location)
+    {
+        if(mBoard[location] == OPEN_SPOT)
+        {   mBoard[location] = player;
+            return true;
+        }
+        return false;
     }
 
     /* Check for a winner.  Return:
