@@ -153,4 +153,12 @@ public class AndroidTicTacToeActivity {
     public char getBoardOccupant(int i) {
         return mBoard[i];
     }
+
+    public char[] getBoardState(){
+        return this.mBoard;
+    }
+
+    public void setBoardState(char[] board){
+        mBoard=board;
+    }
 }

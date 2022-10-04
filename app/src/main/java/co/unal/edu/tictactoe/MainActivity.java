@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     static final int DIALOG_QUIT_ID = 1;
 
     private TextView mInfoTextView;
+    private TextView mHumanTextView;
+    private TextView mComputerTextView;
+    private TextView mTiesTextView;
 
     private BoardView mBoardView;
 
@@ -41,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mWinMediaPlayer;
     MediaPlayer mLoseMediaPlayer;
     MediaPlayer mTieMediaPlayer;
+
+    private Integer mHumanCount = 0;
+    private Integer mComputerCount = 0 ;
+    private Integer mTieCount = 0;
+
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
         mBoardView.setGame(mGame);
         mBoardView.setOnTouchListener(mTouchListener);
 
+        mPrefs = getSharedPreferences("ttt_prefs", MODE_PRIVATE);
+        mHumanCount = mPrefs.getInt("mHumanWins", 0);
+        mComputerCount = mPrefs.getInt("mComputerWins", 0);
+        mTieCount = mPrefs.getInt("mTies", 0);
+
         binding.buttonNewGame.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -66,7 +81,25 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
-        startNewGame();
+        mHumanTextView = binding.victoriasHumano;
+        mHumanTextView.setText(getString(R.string.human_count, mHumanCount));
+
+        mComputerTextView = binding.victoriasComputadora;
+        mComputerTextView.setText(getString(R.string.android_count, mComputerCount));
+
+        mTiesTextView = binding.empates;
+        mTiesTextView.setText(getString(R.string.ties_count, mTieCount));
+
+        if (savedInstanceState == null) {
+            startNewGame();
+        }
+        else {
+            // Restore the game's state
+            onRestoreInstanceState(savedInstanceState);
+        }
+        displayScores();
+
+        //startNewGame();
     }
 
     @Override
@@ -109,8 +142,22 @@ public class MainActivity extends AppCompatActivity {
             case R.id.quit:
                 showDialog(DIALOG_QUIT_ID);
                 return true;
+            case R.id.reset:
+                reset();
+                return true;
         }
         return false;
+    }
+
+    public void reset(){
+        mHumanCount=0;
+        mComputerCount=0;
+        mTieCount=0;
+        mHumanTextView.setText(getString(R.string.human_count, mHumanCount));
+        mComputerTextView.setText(getString(R.string.android_count, mComputerCount));
+        mTiesTextView.setText(getString(R.string.ties_count, mTieCount));
+        displayScores();
+        startNewGame();
     }
 
     @Override
@@ -168,6 +215,15 @@ public class MainActivity extends AppCompatActivity {
         mGameOver = false;
         humanTurn = true;
         mInfoTextView.setText(R.string.first_human);
+        mHumanTextView.setText(getString(R.string.human_count, mHumanCount));
+        mComputerTextView.setText(getString(R.string.android_count, mComputerCount));
+        mTiesTextView.setText(getString(R.string.ties_count, mTieCount));
+    }
+
+    private void displayScores() {
+        mHumanTextView.setText(getString(R.string.human_count, mHumanCount));
+        mComputerTextView.setText(getString(R.string.android_count, mComputerCount));
+        mTiesTextView.setText(getString(R.string.ties_count, mTieCount));
     }
 
     public class ButtonClickListener implements View.OnClickListener{
@@ -258,6 +314,10 @@ public class MainActivity extends AppCompatActivity {
         if (winner == 0)
             mInfoTextView.setText(R.string.turn_human);
         else if (winner == 1) {
+            if(!mGameOver) {
+                mTieCount++;
+                mTiesTextView.setText(getString(R.string.ties_count, mTieCount));
+            }
             mInfoTextView.setText(R.string.result_tie);
             mTieMediaPlayer.start();
             mGameOver = true;
@@ -267,6 +327,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 3000);
         } else if (winner == 2) {
+            if(!mGameOver) {
+                mHumanCount++;
+                mHumanTextView.setText(getString(R.string.human_count, mHumanCount));
+            }
             mInfoTextView.setText(R.string.result_human_wins);
             mWinMediaPlayer.start();
             mGameOver = true;
@@ -276,6 +340,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 3000);
         } else {
+            if(!mGameOver) {
+                mComputerCount++;
+                mComputerTextView.setText(getString(R.string.android_count, mComputerCount));
+            }
             mInfoTextView.setText(R.string.result_computer_wins);
             mLoseMediaPlayer.start();
             mGameOver = true;
@@ -285,5 +353,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 3000);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putCharArray("board", mGame.getBoardState());
+        outState.putBoolean("mGameOver", mGameOver);
+        outState.putInt("mHumanWins", Integer.valueOf(mHumanCount));
+        outState.putInt("mComputerWins", Integer.valueOf(mComputerCount));
+        outState.putInt("mTies", Integer.valueOf(mTieCount));
+        outState.putCharSequence("info", mInfoTextView.getText());
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mGame.setBoardState(savedInstanceState.getCharArray("board"));
+        mGameOver = savedInstanceState.getBoolean("mGameOver");
+        mInfoTextView.setText(savedInstanceState.getCharSequence("info"));
+        mHumanCount = savedInstanceState.getInt("mHumanWins");
+        mComputerCount = savedInstanceState.getInt("mComputerWins");
+        mTieCount= savedInstanceState.getInt("mTies");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Save the current scores
+        SharedPreferences.Editor ed = mPrefs.edit();
+        ed.putInt("mHumanWins", mHumanCount);
+        ed.putInt("mComputerWins", mComputerCount);
+        ed.putInt("mTies", mTieCount);
+        ed.commit();
     }
 }

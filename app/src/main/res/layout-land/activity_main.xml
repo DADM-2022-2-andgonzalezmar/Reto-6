@@ -4,39 +4,13 @@
     android:layout_height="fill_parent"
     android:background="#877474"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
     <co.unal.edu.tictactoe.BoardView
         android:id="@+id/board"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_marginTop="5dp" />
-
-    <TextView
-        android:id="@+id/information"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center_horizontal"
-        android:text="info"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
-
-    <Button
-        android:id="@+id/buttonNewGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/new_game" />
-
-    <TextView
-        android:id="@+id/victoriasHumano"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
-        android:text="@string/human_count"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/victoriasComputadora"
@@ -57,5 +31,31 @@
         android:text="@string/ties_count"
         android:textColor="@color/black"
         android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/victoriasHumano"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:text="@string/human_count"
+        android:textColor="@color/black"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/information"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="info"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/buttonNewGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_game" />
 
 </LinearLayout>

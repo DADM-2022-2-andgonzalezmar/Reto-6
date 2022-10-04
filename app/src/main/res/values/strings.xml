@@ -14,4 +14,7 @@
     <string name="quit_question">"¿Desea salir de la app?"</string>
     <string name="yes">Si</string>
     <string name="no">No</string>
+    <string name="human_count">Jugador: %1$d</string>
+    <string name="android_count">Android: %1$d</string>
+    <string name="ties_count">Empates: %1$d</string>
 </resources>
